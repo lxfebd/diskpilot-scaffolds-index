@@ -3,10 +3,17 @@
 DiskPilot 桌面端插件市场的官方索引仓库。应用内「设置 → 插件市场 → 索引地址」填：
 
 ```
-https://raw.githubusercontent.com/lxfebd/diskpilot-scaffolds-index/main/index.json
+https://cdn.jsdelivr.net/gh/lxfebd/diskpilot-scaffolds-index@main/index.json
 ```
 
 刷新后即可浏览、安装、更新、回滚社区插件（安装/卸载进回收站，写操作需确认）。
+
+> 为什么默认推荐 jsDelivr CDN：`raw.githubusercontent.com` 的 Fastly 边缘
+> IP 段在国内网络常年不可达（`github.com` 主站正常、raw 超时），直接引导它会让
+> 市场"拉不到索引"。jsDelivr 自动镜像本仓库 `main` 分支，内容同源、国内可访问。
+> 用不了 CDN 的环境可改填官方原始地址：
+> `https://raw.githubusercontent.com/lxfebd/diskpilot-scaffolds-index/main/index.json`
+>（两类地址内容完全一致，`index.json` 信封里的 `source_url` 一律标注官方原始源）。
 
 ## 这是什么
 
