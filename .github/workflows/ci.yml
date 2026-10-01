@@ -1,0 +1,37 @@
+name: validate-index
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate index.json contract
+        run: |
+          python - <<'EOF'
+          import json
+          d = json.load(open("index.json", encoding="utf-8"))
+          assert d["schema"] == 1, "schema 必须为 1"
+          assert len(d["plugins"]) > 0, "plugins[] 不能为空"
+          seen = set()
+          for p in d["plugins"]:
+              assert p["id"] and p["name"] and p["version"], f"必填字段缺失: {p.get('id')}"
+              assert p["id"] not in seen, f"重复 id: {p['id']}"
+              seen.add(p["id"])
+              url, sha = p["url"], p["sha256"]
+              # 两种合法状态：待上架占位（url 空）或可装（url https + sha256 齐全）；
+              # 拒绝 url 非空但 sha256 空这种半吊子。
+              if not url:
+                  assert not sha, f"占位条目不应带 sha256: {p.get('id')}"
+                  continue
+              assert url.startswith("https://"), f"url 必须 https: {p.get('id')}"
+              assert sha, f"sha256 不能为空（url 已填）: {p.get('id')}"
+          print(f"OK: {len(d['plugins'])} 个插件，契约校验通过")
+          EOF
